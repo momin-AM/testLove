@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Love Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #ffe6e6;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #ff4d4d;
+        }
+        h2 {
+  border-bottom: 3px dotted #850691; /* or any color you prefer */
+  padding-bottom: 4px;
+  display: inline-block;
+}
+
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        input {
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            border: none;
+            background-color: #ff4d4d;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ff1a1a;
+        }
+        #infoTrigger {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+}
+
+#infoBtn {
+  font-size: 18px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+#infoLogo {
+  height: 28px;
+  width: auto;
+  border-radius: 5px;
+  opacity: 0.9;
+}
+
+/* Overlay Panel */
+#infoOverlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: none;
+  z-index: 999;
+  padding: 20px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+#infoPanel h3 {
+  margin-top: 0;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>How much does your partner love you?</h1>
+
+        <!-- Create Ticket Section -->
+        <div class="input-group">
+            <h2>Create Ticket</h2>
+            <input type="text" id="nameInput" placeholder="Enter your name" />
+            <button onclick="startQuiz()">Submit</button>
+        </div>
+
+        <!-- Test Love Section -->
+        <div class="input-group">
+            <h2>Test Love</h2>
+            <input type="text" id="ticketInput" placeholder="Enter Ticket ID" />
+            <button onclick="testLove()">Submit</button>
+        </div>
+    <!-- Info Trigger and Panel -->
+<div id="infoTrigger">
+  <button id="infoBtn">ℹ️</button>
+  <img src="assets/logo.png" alt="Logo" id="infoLogo">
+  <p>© 2025 Momin's Adda</p>
+  <a href="momin-am.github.io/web">visit❤️</a>
+</div>
+
+<div id="infoOverlay">
+  <div id="infoPanel">
+    <h3>📘 Instructions</h3>
+    <p>
+      💡 Answer each question honestly.<br>
+      🎯 Click “Next” to move ahead.<br>
+      🎟️ In “Create Ticket” mode, you’ll get a unique shareable ID.<br>
+      💞 In “Test Love” mode, match your partner’s answers for your love score!
+    </p>
+  </div>
+</div>
+
+
+
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCVgY_8I53uECwfO_OCnByt2gQ4Lw8pilI",
+        authDomain: "choices-dd532.firebaseapp.com",
+        projectId: "choices-dd532",
+        storageBucket: "choices-dd532.appspot.com",
+        messagingSenderId: "1098164079297",
+        appId: "1:1098164079297:web:88691d7d58b5ca0dde6240",
+        measurementId: "G-SJ9F7BGWPH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.startQuiz = function () {
+        const name = document.getElementById("nameInput").value.trim();
+        if (name === "") {
+            alert("Please enter your name.");
+            return;
+        }
+
+        localStorage.setItem("currentUser", name);
+        localStorage.removeItem("testID");
+        window.location.href = "test.html";
+    };
+
+    window.testLove = async function () {
+        const ticketID = document.getElementById("ticketInput").value.trim();
+        if (ticketID === "") {
+            alert("Please enter a valid Ticket ID.");
+            return;
+        }
+
+        try {
+            const docRef = doc(db, "tickets", ticketID);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                localStorage.setItem("testID", ticketID);
+                localStorage.setItem("testData", JSON.stringify(docSnap.data()));
+                window.location.href = "test.html";
+            } else {
+                alert("Invalid Ticket ID! Try again.");
+            }
+        } catch (error) {
+            console.error("Error fetching ticket:", error);
+            alert("Something went wrong, please try again.");
+        }
+    };
+    const infoBtn = document.getElementById("infoBtn");
+const infoOverlay = document.getElementById("infoOverlay");
+
+infoBtn.onclick = () => {
+  infoOverlay.style.display = infoOverlay.style.display === "block" ? "none" : "block";
+};
+
+</script>
+
+</body>
+</html>
