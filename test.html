@@ -1,256 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Love Test Questions</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #ffe6e6;
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-      padding: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
-    }
-    h1 {
-      color: #ff4d4d;
-    }
-    .question-container {
-      text-align: left;
-      margin-top: 20px;
-    }
-    .radio-group {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    button {
-      padding: 10px 20px;
-      margin-top: 15px;
-      border: none;
-      background-color: #ff4d4d;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #ff1a1a;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Test Questions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #ffe6e6;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #ff4d4d;
+        }
+
+        .question-container {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 15px;
+            border: none;
+            background-color: #ff4d4d;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ff1a1a;
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <button onclick="window.location.href='index.html'" style="margin-bottom: 10px;">← Back</button>
-    <h1 id="quizTitle"></h1>
-    <div id="questionContainer"></div>
-    <button id="nextBtn" onclick="nextQuestion()">Next</button>
-    <h2 id="result" style="display:none;"></h2>
-    <div id="ticketMessage" style="margin-top: 20px; font-weight: bold; color: #333;"></div>
+    <div class="container">
+        <button onclick="window.location.href='index.html'" style="margin-bottom: 10px;">← Back</button>
+        <h1 id="quizTitle"></h1>
+        <div id="questionContainer"></div>
+        <button id="nextBtn" onclick="nextQuestion()">Next</button>
+        <h2 id="result" style="display:none;"></h2>
+        <div id="ticketMessage" style="margin-top: 20px; font-weight: bold; color: #333;"></div>
 
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCVgY_8I53uECwfO_OCnByt2gQ4Lw8pilI",
-      authDomain: "choices-dd532.firebaseapp.com",
-      projectId: "choices-dd532",
-      storageBucket: "choices-dd532.appspot.com",
-      messagingSenderId: "1098164079297",
-      appId: "1:1098164079297:web:88691d7d58b5ca0dde6240",
-      measurementId: "G-SJ9F7BGWPH"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    let currentQuestion = 0;
-    let answers = [];
-
-    const questions = [
-      "Which food does your partner love most?",
-      "Which place would they visit first?",
-      "What is their favorite hobby?",
-      "Which movie genre do they prefer?",
-      "What is their dream vacation?",
-      "Which pet would they adopt?",
-      "Which color do they love most?",
-      "What is their go-to drink?",
-      "Which season do they enjoy most?",
-      "What is their ideal weekend activity?"
-    ];
-
-    const options = [
-  ["🍕 Pizza", "🍔 Burger", "🍣 Sushi", "🍝 Pasta", "🥗 Salad", "🥩 Steak", "🍜 Noodles", "🌮 Tacos", "🍖 BBQ", "🍚 Fried Rice"],
-  ["🏖️ Beach", "🏔️ Mountains", "🏙️ City", "🌄 Countryside", "🏜️ Desert", "🏝️ Island", "🌲 Forest", "🏛️ Historical Site", "🎢 Theme Park", "🏞️ Lakeside"],
-  ["📖 Reading", "🎮 Gaming", "🍳 Cooking", "⚽ Sports", "🎵 Music", "💃 Dancing", "✂️ Crafting", "📷 Photography", "🧘 Meditation", "🌍 Traveling"],
-  ["💥 Action", "😂 Comedy", "❤️ Romance", "👻 Horror", "👽 Sci-Fi", "🧙 Fantasy", "🎬 Documentary", "🎭 Drama", "🔪 Thriller", "🕵️ Mystery"],
-  ["🗼 Paris", "🌺 Hawaii", "🗾 Tokyo", "🎡 London", "🏝️ Maldives", "🗽 New York", "🏛️ Rome", "🌉 Sydney", "🌆 Dubai", "🏔️ Switzerland"],
-  ["🐶 Dog", "🐱 Cat", "🐦 Bird", "🐠 Fish", "🐰 Rabbit", "🐴 Horse", "🐹 Hamster", "🐢 Turtle", "🐍 Snake", "🦎 Lizard"],
-  ["🟥 Red", "🟦 Blue", "🟩 Green", "🟨 Yellow", "🩷 Pink", "🟪 Purple", "⬛ Black", "⬜ White", "🟧 Orange", "🐬Teal"],
-  ["☕ Coffee", "🍵 Tea", "🧃 Juice", "🥤 Soda", "🍨 Milkshake", "🥤 Smoothie", "🍺 Beer", "🍷 Wine", "🍸 Cocktail", "💧 Water"],
-  ["❄️ Winter", "🌸 Spring", "☀️ Summer", "🍁 Autumn", "🌧️ Rainy", "🌫️ Foggy", "🌨️ Snowy", "🌞 Sunny", "💨 Windy", "🥶 Chilly"],
-  ["🏕️ Camping", "📺 Netflix", "🛍️ Shopping", "🎉 Partying", "⚽ Sports", "🍳 Cooking", "🎨 Art", "🥾 Hiking", "🎧 Music", "😴 Sleeping"]
-];
+    </div>
 
 
-    let mode = "create";
-    let userName = localStorage.getItem("currentUser");
-    let ticketID = localStorage.getItem("testID");
-    let ticketData = ticketID ? JSON.parse(localStorage.getItem("testData")) : null;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-    window.onload = () => {
-      if (!userName) {
-        alert("User name not found. Redirecting to home.");
-        window.location.href = "index.html";
-        return;
-      }
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVgY_8I53uECwfO_OCnByt2gQ4Lw8pilI",
+            authDomain: "choices-dd532.firebaseapp.com",
+            projectId: "choices-dd532",
+            storageBucket: "choices-dd532.appspot.com",
+            messagingSenderId: "1098164079297",
+            appId: "1:1098164079297:web:88691d7d58b5ca0dde6240",
+            measurementId: "G-SJ9F7BGWPH"
+        };
 
-      mode = ticketID ? "test" : "create";
-      document.getElementById("quizTitle").innerText =
-        mode === "test"
-          ? `How much do you know ${ticketData.name}?`
-          : `Answer these questions to create a ticket!`;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-      loadQuestion();
-    };
+        let currentQuestion = 0;
+        let answers = [];
 
-    window.loadQuestion = function () {
-      const container = document.getElementById("questionContainer");
-      container.innerHTML = "";
+        const questions = [
+            "love most?",
+            "prefer to visit?",
+            "enjoy doing the most?",
+            "prefer in movies?",
+            "dream of vacationing at?",
+            "want to adopt as a pet?",
+            "like as a color?",
+            "enjoy drinking?",
+            "like as a season?",
+            "prefer for weekends?"
+        ];
 
-      let questionText = document.createElement("p");
-      questionText.innerText = questions[currentQuestion];
-      container.appendChild(questionText);
+        const options = [
+            ["🍕 Pizza", "🍔 Burger", "🍣 Sushi", "🍝 Pasta", "🥗 Salad", "🥩 Steak", "🍜 Noodles", "🌮 Tacos", "🍖 BBQ", "🍚 Fried Rice"],
+            ["🏖️ Beach", "🏔️ Mountains", "🏙️ City", "🌄 Countryside", "🏜️ Desert", "🏝️ Island", "🌲 Forest", "🏛️ Historical Site", "🎢 Theme Park", "🏞️ Lakeside"],
+            ["📖 Reading", "🎮 Gaming", "🍳 Cooking", "⚽ Sports", "🎵 Music", "💃 Dancing", "✂️ Crafting", "📷 Photography", "🧘 Meditation", "🌍 Traveling"],
+            ["💥 Action", "😂 Comedy", "❤️ Romance", "👻 Horror", "👽 Sci-Fi", "🧙 Fantasy", "🎬 Documentary", "🎭 Drama", "🔪 Thriller", "🕵️ Mystery"],
+            ["🗼 Paris", "🌺 Hawaii", "🗾 Tokyo", "🎡 London", "🏝️ Maldives", "🗽 New York", "🏛️ Rome", "🌉 Sydney", "🌆 Dubai", "🏔️ Switzerland"],
+            ["🐶 Dog", "🐱 Cat", "🐦 Bird", "🐠 Fish", "🐰 Rabbit", "🐴 Horse", "🐹 Hamster", "🐢 Turtle", "🐍 Snake", "🦎 Lizard"],
+            ["🟥 Red", "🟦 Blue", "🟩 Green", "🟨 Yellow", "🩷 Pink", "🟪 Purple", "⬛ Black", "⬜ White", "🟧 Orange", "🐬 Teal"],
+            ["☕ Coffee", "🍵 Tea", "🧃 Juice", "🥤 Soda", "🍨 Milkshake", "🥤 Smoothie", "🍺 Beer", "🍷 Wine", "🍸 Cocktail", "💧 Water"],
+            ["❄️ Winter", "🌸 Spring", "☀️ Summer", "🍁 Autumn", "🌧️ Rainy", "🌫️ Foggy", "🌨️ Snowy", "🌞 Sunny", "💨 Windy", "🥶 Chilly"],
+            ["🏕️ Camping", "📺 Netflix", "🛍️ Shopping", "🎉 Partying", "⚽ Sports", "🍳 Cooking", "🎨 Art", "🥾 Hiking", "🎧 Music", "😴 Sleeping"]
+        ];
 
-      let radioGroup = document.createElement("div");
-      radioGroup.className = "radio-group";
+        let mode = "create";
+        let userName = localStorage.getItem("currentUser");
+        let ticketID = localStorage.getItem("testID");
+        let ticketData = ticketID ? JSON.parse(localStorage.getItem("testData")) : null;
 
-      options[currentQuestion].forEach((option, index) => {
-        let label = document.createElement("label");
-        let radio = document.createElement("input");
-        radio.type = "radio";
-        radio.name = "answer";
-        radio.value = index;
-        label.appendChild(radio);
-        label.appendChild(document.createTextNode(option));
-        radioGroup.appendChild(label);
-      });
+        window.onload = () => {
+            if (!userName) {
+                alert("User name not found. Redirecting to home.");
+                window.location.href = "index.html";
+                return;
+            }
 
-      container.appendChild(radioGroup);
-    };
+            mode = ticketID ? "test" : "create";
+            document.getElementById("quizTitle").innerText =
+                mode === "test"
+                    ? `How much do you know ${ticketData.name}?`
+                    : `Answer these questions to create a ticket!`;
 
-    window.nextQuestion = async function () {
-  const selectedOption = document.querySelector('input[name="answer"]:checked');
-  if (!selectedOption) {
-    alert("Please select an answer.");
-    return;
-  }
+            loadQuestion();
+        };
 
-  answers.push(parseInt(selectedOption.value));
-  currentQuestion++;
+        window.loadQuestion = function () {
+            const container = document.getElementById("questionContainer");
+            container.innerHTML = "";
 
-  if (currentQuestion < questions.length) {
-    loadQuestion();
-  } else {
-    // ✅ Hide the button to prevent clicking again
-    document.querySelector("button").style.display = "none";
+            let questionText = document.createElement("p");
+            let nameToUse = mode === "test" ? ticketData.name : userName;
+            let prefix = mode === "test" ? `What does ${nameToUse} ` : `What do you `;
+            questionText.innerText = `${prefix}${questions[currentQuestion]}`;
+            container.appendChild(questionText);
 
-    mode === "create" ? await generateTicket() : calculateResults();
-  }
-};
+            let radioGroup = document.createElement("div");
+            radioGroup.className = "radio-group";
 
+            options[currentQuestion].forEach((option, index) => {
+                let label = document.createElement("label");
+                let radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = "answer";
+                radio.value = index;
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(option));
+                radioGroup.appendChild(label);
+            });
 
-    async function generateTicket() {
-      const newTicketID = "T" + Math.floor(Math.random() * 1000000);
-      try {
-        await setDoc(doc(db, "tickets", newTicketID), {
-          name: userName,
-          choices: answers
-        });
+            container.appendChild(radioGroup);
+        };
+        window.nextQuestion = async function () {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (!selectedOption) {
+                alert("Please select an answer.");
+                return;
+            }
 
-        const ticketText = `Your Ticket ID: ${newTicketID}`;
-document.getElementById("ticketMessage").innerText = `✅ ${ticketText}\n💌 Share this with your partner!`;
+            answers.push(parseInt(selectedOption.value));
+            currentQuestion++;
 
-// ✅ Copy to clipboard
-navigator.clipboard.writeText(newTicketID).then(() => {
-  console.log("Ticket copied to clipboard!");
-});
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                document.getElementById("nextBtn").style.display = "none";
+                mode === "create" ? await generateTicket() : calculateResults();
+            }
+        };
 
-          
+        async function generateTicket() {
+            const newTicketID = "T" + Math.floor(Math.random() * 1000000);
+            try {
+                await setDoc(doc(db, "tickets", newTicketID), {
+                    name: userName,
+                    choices: answers
+                });
 
-        // Hide the "Next" button
-        document.querySelector("button[onclick='nextQuestion()']").style.display = "none";
+                const ticketText = `Your Ticket ID: ${newTicketID}`;
+                document.getElementById("ticketMessage").innerText = `✅ ${ticketText}\n💌 Share this with your partner!`;
 
-        // Show back button
-        const backButton = document.createElement("button");
-        backButton.innerText = "← Back to Home";
-        backButton.onclick = () => window.location.href = "index.html";
-        backButton.style.marginTop = "20px";
-        backButton.style.backgroundColor = "#4CAF50";
-        backButton.style.color = "white";
-        backButton.style.border = "none";
-        backButton.style.padding = "10px 20px";
-        backButton.style.borderRadius = "5px";
-        backButton.style.cursor = "pointer";
+                navigator.clipboard.writeText(newTicketID).then(() => {
+                    console.log("Ticket copied to clipboard!");
+                });
 
-        // Add it below the ticket message
-        document.querySelector(".container").appendChild(backButton);
-      } catch (e) {
-        document.getElementById("ticketMessage").innerText = "❌ Error creating ticket. Try again.";
-      }
-    }
+                const backButton = document.createElement("button");
+                backButton.innerText = "← Back to Home";
+                backButton.onclick = () => window.location.href = "index.html";
+                backButton.style.marginTop = "20px";
+                backButton.style.backgroundColor = "#4CAF50";
+                backButton.style.color = "white";
+                backButton.style.border = "none";
+                backButton.style.padding = "10px 20px";
+                backButton.style.borderRadius = "5px";
+                backButton.style.cursor = "pointer";
 
-    function calculateResults() {
-  let matchCount = 0;
-  let savedChoices = ticketData.choices;
+                document.querySelector(".container").appendChild(backButton);
+            } catch (e) {
+                document.getElementById("ticketMessage").innerText = "❌ Error creating ticket. Try again.";
+            }
+        }
 
-  for (let i = 0; i < savedChoices.length; i++) {
-    if (savedChoices[i] === answers[i]) {
-      matchCount++;
-    }
-  }
+        function calculateResults() {
+            let matchCount = 0;
+            let savedChoices = ticketData.choices;
 
-  let matchPercentage = Math.round((matchCount / questions.length) * 100);
-  let message =
-    matchPercentage > 80
-      ? "💖 Soulmates!"
-      : matchPercentage > 50
-      ? "✨ Pretty good match!"
-      : "😅 Still learning about each other.";
+            for (let i = 0; i < savedChoices.length; i++) {
+                if (savedChoices[i] === answers[i]) {
+                    matchCount++;
+                }
+            }
 
-  const result = document.getElementById("result");
-  result.innerHTML = `You know ${ticketData.name} <strong>${matchPercentage}%</strong> well!<br>${message}`;
-  result.style.display = "block";
+            let matchPercentage = Math.round((matchCount / questions.length) * 100);
+            let message =
+                matchPercentage > 80
+                    ? "💖 Soulmates!"
+                    : matchPercentage > 50
+                        ? "✨ Pretty good match!"
+                        : "😅 Still learning about each other.";
 
-  // ✅ Hide the Next button properly
-  const nextBtn = document.getElementById("nextBtn");
-  if (nextBtn) nextBtn.style.display = "none";
+            const result = document.getElementById("result");
+            result.innerHTML = `You know ${ticketData.name} <strong>${matchPercentage}%</strong> well!<br>${message}`;
+            result.style.display = "block";
 
-  // ✅ Add back button in its place
-  const backBtn = document.createElement("button");
-  backBtn.innerText = "← Back to Home";
-  backBtn.onclick = () => window.location.href = "index.html";
-  backBtn.style.marginTop = "20px";
-  backBtn.style.backgroundColor = "#4CAF50";
-  backBtn.style.color = "white";
-  backBtn.style.border = "none";
-  backBtn.style.padding = "10px 20px";
-  backBtn.style.borderRadius = "5px";
-  backBtn.style.cursor = "pointer";
+            const nextBtn = document.getElementById("nextBtn");
+            if (nextBtn) nextBtn.style.display = "none";
 
-  result.after(backBtn);
-}
+            const backBtn = document.createElement("button");
+            backBtn.innerText = "← Back to Home";
+            backBtn.onclick = () => window.location.href = "index.html";
+            backBtn.style.marginTop = "20px";
+            backBtn.style.backgroundColor = "#4CAF50";
+            backBtn.style.color = "white";
+            backBtn.style.border = "none";
+            backBtn.style.padding = "10px 20px";
+            backBtn.style.borderRadius = "5px";
+            backBtn.style.cursor = "pointer";
 
-
-  </script>
+            result.after(backBtn);
+        }
+    </script>
 </body>
 </html>
